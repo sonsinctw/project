@@ -1,0 +1,101 @@
+<!-- index.html -->
+{% extends "app/base.html" %}
+
+{% block body %}
+<div class="container">
+    <h1 class="ml-4 mt-4 mb-4">All Products</h1>
+    
+
+    <div class="row">
+        <div class="col-md-2 mb-4">
+            <a class="btn btn-primary btn-block" href="{% url 'add' %}" >
+                <i class="fa-solid fa-plus fa-lg"></i> Add 
+            </a>
+        </div>
+    
+        <div class="col-md-4 mb-4">
+            <form method="GET" action="{% url 'index' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <select class="form-select" name="filter">
+                        <option value="">All</option>
+                        <option value="available">Available</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    
+        <div class="col-md-4 mb-4">
+            <form method="GET" action="{% url 'index' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search_query" placeholder="Search...">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+           
+        </div>
+    
+        <div class="col-md-2 mb-4">
+            <form id="barcodeForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="barcodeImage" class="btn btn-primary btn-block">
+                    <input type="file" name="image" accept="image/*" id="barcodeImage" style="display:none;">
+                    <img src="/static/image/barcode.svg" alt="Barcode Icon" width="30" height="30">  Reader
+                </label>
+            </form>
+            <div id="barcodeResult"></div>
+        </div>
+        
+    </div>
+    
+
+    <div class="row">
+        <div class="col-12">
+            {% if products %}
+            <div class="card bg-light mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="fa-solid fa-list fa-lg"></i> Product List 
+                </div>
+                <div class="card-body ">
+                    <p class="card-text">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered table-striped table-sm" style="font-size: 16px;">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td><span style="font-size: 20px;">{{ product.product_code }}</span></td>
+                                        <td><span style="font-size: 20px;">{{ product.name }}</span></td>
+                                        <td><span style="font-size: 20px;">{{ product.shelf }}</span></td>
+                                        <td><span style="font-size: 20px; ">{% if product.status %}✅{% else %}❌{% endif %}</span></td>                   
+                                        <td>
+                                            <a class="btn btn-outline-dark btn-sm " href="{% url 'product_detail' product.id %}">
+                                                <i class="fas fa-info-circle fa-lg"></i> <span style="font-size: 14px;"> Detail</span> 
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </p>
+                </div>
+            </div>
+            {% else %}
+                <h5 class="alert alert-primary ms-4 me-4">No Product</h5>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+<!-- base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <title>WMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px; /* adjust as needed */
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand{% if not user.is_authenticated %} disabled{% endif %}" href="{% if user.is_authenticated %}{% url 'index' %}{% else %}{% url 'login' %}{% endif %}">
+                <i class="fa-solid fa-cubes-stacked fa-lg"></i> WMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <!-- เพิ่มส่วนของการแสดงสถานะ login ตรงนี้ -->
+                {% if user.is_authenticated %}
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">
+                                <i class="fa-solid fa-table-list fa-lg"></i> All Product
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'history' %}">
+                                <i class="fa-solid fa-history fa-lg"></i> History
+                            </a>
+                        </li>
+                        
+                            <li class="nav-item">
+                                <a class="nav-link" id="connection-status">
+                                    <i class="fa-solid fa-rss"></i> Connecting... 
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-block" href="{% url 'change_ip' %}" style="color: white;">
+                                    <i class="fas fa-cog fa-lg"></i> 
+                                </a>
+                            </li>
+                      
+                        
+                    </ul>
+                  
+                   
+                 
+                    <span class="navbar-text me-3">Hi, {{ user.username }}</span>
+                    <a class="btn btn-link" href="{% url 'logout' %}" style="color: white; text-decoration: none;">Logout</a>
+                    {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        {% block body %}
+        {% endblock %}
+    </div>
+    <footer class="mt-auto mb-4">
+        <div class="text-center">
+            <span>
+                Copyright &copy; <script>document.write(new Date().getFullYear())</script> SU WMS FINAL YEAR PROJECT.
+            </span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        
+        $(document).ready(function(){
+            // เรียกฟังก์ชันสำหรับตรวจสอบสถานะเชื่อมต่อโดยเริ่มต้นทันทีเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
+            checkConnectionStatus();
+        
+            // สร้างฟังก์ชันสำหรับตรวจสอบสถานะการเชื่อมต่อ
+            function checkConnectionStatus(){
+                $.ajax({
+                    url: "{% url 'check_connection' %}",  // URL ของฟังก์ชันตรวจสอบการเชื่อมต่อ
+                    success: function(response){
+                        // อัปเดตสถานะการเชื่อมต่อ
+                        if(response.nodemcu_connected){
+                            $("#connection-status").html('<i class="fa-solid fa-rss fa-lg"></i> Status: Connect to {{ request.session.nodeMCU_url|slice:"7:"|slice:":-17" }}');
+                            $("#connection-status").css("color", "white");
+
+                            // แสดงปุ่ม put away, picking และ move
+                            $(".put-away-btn").show();
+                            $(".picking-btn").show();
+                            $(".move-btn").show();
+                        } else {
+                            $("#connection-status").html('<i class="fa-solid fa-rss fa-lg"></i> Status: Disconnected');
+                            $("#connection-status").css("color", "white");
+
+                            // ซ่อนปุ่ม put away, picking และ move
+                            $(".put-away-btn").hide();
+                            $(".picking-btn").hide();
+                            $(".move-btn").hide();
+                        }                        
+                        // รีเฟรชสถานะการเชื่อมต่อทุก 5 วินาที
+                        setTimeout(checkConnectionStatus, 5000);
+                    },
+                    error: function(){
+                        // ถ้ามีข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์ ระบุว่าเชื่อมต่อไม่สำเร็จ
+                        $("#connection-status").html('<i class="fa-solid fa-wifi-signal fa-lg text-muted"></i> Error');
+                        // ซ่อนปุ่ม put away, picking และ move
+                        $(".put-away-btn").hide();
+                        $(".picking-btn").hide();
+                        $(".move-btn").hide();
+                        // ลองเชื่อมต่ออีกครั้งหลังจาก 5 วินาที
+                        setTimeout(checkConnectionStatus, 5000);
+                    }
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!-- history.html -->
+
+{% extends "app/base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h2 class="m-4">History</h2>
+        <div class="row justify-content-end mb-3">
+            <div class="col-auto">
+                <!-- Add a form to clear history with confirmation box -->
+                <form id="clearHistoryForm" method="post" action="{% url 'clear_history' %}" onsubmit="return confirm('Are you sure you want to clear the history?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Clear History</button>
+                </form>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>Product Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in history %}
+                    <tr>
+                        <td><small>{{ entry.date }}</small></td>
+                        <td><small>{{ entry.action }}</small></td>
+                        <td><small>{{ entry.product_code }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

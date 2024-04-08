@@ -1,0 +1,24 @@
+<!-- move.html -->
+{% extends "app/base.html" %}
+
+{% block body %}
+<div class="container">
+    <h3 class="mt-4">Move Product</h3>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'update_shelf' product.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="new_shelf">Select New Shelf:</label>
+                    <select class="form-control" id="new_shelf" name="new_shelf">
+                        {% for shelf in available_shelves %}
+                            <option value="{{ shelf }}">{{ shelf }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Move</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

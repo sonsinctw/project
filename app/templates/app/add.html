@@ -1,0 +1,34 @@
+<!-- add.html -->
+{% extends "app/base.html" %}
+
+{% block body %}
+<div class="container">
+    <h3 class="text-center m-4">Add Product</h3>
+    {% if success %}
+        <div class="alert alert-success" role="alert">
+            The new product added successfully.
+            <a href="{% url 'index' %}" class="alert-link">Go to Home Page.</a>
+        </div>
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <i class="fa-solid fa-address-card fa-lg"></i> Product Registration
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'add' %}" method="POST">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-block">Add</button>
+                                <a href="{% url 'index' %}" class="btn btn-secondary btn-block mt-2">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

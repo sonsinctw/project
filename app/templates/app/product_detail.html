@@ -1,0 +1,111 @@
+<!-- product_detail.html -->
+{% extends "app/base.html" %}
+
+{% block body %}
+<div class="container">
+    <h3 class="mt-4">Product Detail</h3>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <ul class="list-unstyled">
+                <li>ID: <strong>{{ product.product_code }}</strong></li>
+                <li>Name: <strong>{{ product.name }}</strong></li>
+                <li>Shelf: <strong>{{ product.shelf }}</strong></li>
+                <li>Description: <strong>{{ product.description }}</strong></li>
+                <li>Status: {% if product.status %}✅{% else %}❌{% endif %}</li>
+                <li>Barcode: <a href="{{ product.barcode.url }}" target="_blank"><strong>{{ product.product_code}}.png</strong></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <a href="{% url 'index' %}" class="btn btn-light">
+                <i class="fa-solid fa-angle-left fa-lg"></i> Back 
+            </a>
+            <a class="btn btn-warning me-1" href="{% url 'edit' product.id %}">
+                <i class="fa-solid fa-pen-to-square fa-lg"></i> Edit
+            </a>
+            <button type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="fa-solid fa-trash-can fa-lg"></i> Delete
+            </button>
+            
+            {% if product.status %}
+                <button type="button" class="btn btn-info me-1 put-away-btn" data-bs-toggle="modal" data-bs-target="#putAwayModal">
+                    <i class="fa-solid fa-exchange-alt fa-lg"></i> Put Away
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-success me-1 picking-btn" data-bs-toggle="modal" data-bs-target="#pickingModal">
+                    <i class="fa-solid fa-exchange-alt fa-lg"></i> Picking
+                </button>
+            {% endif %}
+            <a href="{% url 'move_product' product.id %}" class="btn btn-primary move-btn">
+                <i class="fa-solid fa-up-down-left-right"></i> Move
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Modal - Delete Product -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this product?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="{% url 'delete' product.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - Put Away Confirmation -->
+<div class="modal fade" id="putAwayModal" tabindex="-1" aria-labelledby="putAwayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="putAwayModalLabel">Put Away Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to put this product away?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="{% url 'update_status' product.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - Picking Confirmation -->
+<div class="modal fade" id="pickingModal" tabindex="-1" aria-labelledby="pickingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pickingModalLabel">Picking Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to pick this product?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="{% url 'update_status' product.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
